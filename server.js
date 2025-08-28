@@ -8,6 +8,11 @@
 /** Importar el archivo de conexión a la base de datos */
 const sequelize = require("./src/models/database/dbconnection");
 
+/**Cargar el archivo de modelos */
+require("./src/models/associations");
+
+
+
 const express = require("express");
 const app = express();
 
