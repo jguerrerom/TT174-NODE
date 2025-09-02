@@ -6,7 +6,11 @@ const index = async (req, res) => {
   try {
     /**BUSCAR TODOS LOS REGISTROS */
 
-    const books = await Book.findAll({});
+    const books = await Book.findAll({
+      where: {
+        is_active: 1
+      }
+    });
 
     return res.status(201).json({
       status: true,
@@ -88,18 +92,82 @@ const show = async (req, res) => {
 
 /**Actualizar un registro especifico */
 const update = async (req, res) => {
-  return res.status(201).json({
-    status: true,
-    message: "Libro actualizado de forma correcta",
-  });
+  try {
+    /**Realizar la busqueda del libro por su id */
+    const { id } = req.params;
+    const bookExist = await Book.findByPk(id, {});
+    console.log("Libro encontrado: ", bookExist);
+    if (bookExist) {
+      console.log("Entro a actualizar");
+      /**Actualizar el libro */
+      await bookExist.update(req.body, {
+        where: {
+          id: id,
+        },
+      });
+
+      console.log("salio de actualizar actualizar");
+
+      /**recuperar el registro actualizado */
+      const bookUpdate = await Book.findByPk(id, {});
+
+      return res.status(201).json({
+        status: true,
+        message: "Libro actualizado de forma correcta",
+        data: bookUpdate,
+      });
+    } else {
+      return res.status(201).json({
+        status: false,
+        message: "Libro no existe en base de datos..............",
+        data: null,
+      });
+    }
+  } catch (error) {
+    console.error(`Sucedió un error al actualizar el libro: ${error}`);
+    return res.status(500).json({
+      status: false,
+      message: `Sucedió un error al actualizar el libro: ${error}`,
+    });
+  }
 };
 
 /**Eliminar un registro especifico */
 const destroy = async (req, res) => {
-  return res.status(201).json({
-    status: true,
-    message: "Libro eliminado de forma correcta",
-  });
+  try {
+    /**Realizar la busqueda del libro por su id */
+    const { id } = req.params;
+    const book = await Book.findByPk(id, {});
+
+    if (!book) {
+      return res.status(404).json({
+        status: true,
+        message: "Libro no existe en la base de datos",
+      });
+    } else {
+      /**eliminar el registro */
+     // await book.destroy({});
+
+     //actualización de estado
+
+     await Book.update( {is_active: 0}, {
+      where: {
+        id:id
+      }
+     })
+      /**envio mensaje de eliminación */
+      return res.status(201).json({
+        status: true,
+        message: "Libro inactivado de forma correcta",
+      });
+    }
+  } catch (error) {
+    console.error(`Sucedió un error al ELIMINAR el libro: ${error}`);
+    return res.status(500).json({
+      status: false,
+      message: `Sucedió un error al eliminar el libro: ${error}`,
+    });
+  }
 };
 
 /**

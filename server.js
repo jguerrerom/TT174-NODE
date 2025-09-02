@@ -16,6 +16,13 @@ require("./src/models/associations");
 const express = require("express");
 const app = express();
 
+
+//--------------------
+// Habilitar CORS para todos los dominios
+//--------------------
+const cors = require("cors");
+app.use(cors());
+
 /** 
  * Importar el archivo de rutas de la API.
  * Todas las rutas definidas en `api.routes.js` estarán disponibles bajo el prefijo `/api`.
